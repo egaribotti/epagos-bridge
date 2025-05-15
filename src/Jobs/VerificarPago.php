@@ -6,7 +6,6 @@ use Carbon\Carbon;
 use EpagosBridge\Events\PagoAcreditado;
 use EpagosBridge\Events\PagoDevuelto;
 use EpagosBridge\Events\PagoRechazado;
-use EpagosBridge\Events\PagoVencido;
 use EpagosBridge\Lib\EpagosApi;
 use EpagosBridge\Models\Boleta;
 use EpagosBridge\Models\Operacion;
@@ -48,19 +47,18 @@ class VerificarPago implements ShouldQueue
                 'fecha_verificacion' => Carbon::now()
             ]);
 
-            PagoAcreditado::dispatch($boleta->id);
+            PagoAcreditado::dispatch($boleta);
         } else {
-            $estados = [79 => 1, 80 => 1, 86 => 5, 67 => 3, 68 => 7, 82 => 6];
+            $estados = [79 => 1, 80 => 1, 86 => 5, 68 => 7];
 
-            $boletaEstadoId = $estados[ord($pago->Estado)];
+            $boletaEstadoId = $estados[ord($pago->Estado)] ?? 6;
             Boleta::find($boleta->id)->update([
                 'boleta_estado_id' => $boletaEstadoId,
                 'fecha_verificacion' => Carbon::now()
             ]);
 
-            PagoVencido::dispatchIf($boletaEstadoId === 5, $boleta->id);
-            PagoRechazado::dispatchIf($boletaEstadoId === 6, $boleta->id);
-            PagoDevuelto::dispatchIf($boletaEstadoId === 7, $boleta->id);
+            if ($boletaEstadoId === 1) return;
+            $boletaEstadoId === 7 ? PagoDevuelto::dispatch($boleta) : PagoRechazado::dispatch($boleta);
         }
     }
 }

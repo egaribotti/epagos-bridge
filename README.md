@@ -1,7 +1,7 @@
 
 # Epagos Bridge
 
-![Versión](https://img.shields.io/badge/versión-1.0.5-blue.svg)
+![Versión](https://img.shields.io/badge/versión-1.0.6-blue.svg)
 
 Este paquete permite integrar Epagos de forma rápida y sencilla en cualquier proyecto.
 Incluye una implementación básica de medidas de seguridad y está diseñado para facilitar la generación de solicitudes de pago, así como la gestión de las respuestas recibidas desde la plataforma.
