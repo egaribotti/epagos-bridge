@@ -1,7 +1,7 @@
 
 # Epagos Bridge
 
-![Versión](https://img.shields.io/badge/versión-1.0.2-blue.svg)
+![Versión](https://img.shields.io/badge/versión-1.0.3-blue.svg)
 
 Este paquete permite integrar Epagos de forma rápida y sencilla en cualquier proyecto.
 Incluye una implementación básica de medidas de seguridad y está diseñado para facilitar la generación de solicitudes de pago, así como la gestión de las respuestas recibidas desde la plataforma.
@@ -9,43 +9,10 @@ Incluye una implementación básica de medidas de seguridad y está diseñado pa
 
 ## 📦 Instalación
 
-Para mantener el acceso a futuras actualizaciones, este paquete debe ser clonado directamente desde el repositorio. No está sujeto a modificaciones externas.
-
-```bash
-mkdir packages
-cd packages
-git clone git@gitlab.empsat.com.ar:egaribotti/epagos-bridge.git
-```
-
-Crear el archivo `.gitignore` para evitar subir el paquete al repositorio remoto del proyecto.
-```gitignore
-*
-!.gitignore
-```
-
-Configurar el composer.json del proyecto donde se quiere usar el paquete.
-
-```json
-{
-  "repositories": [
-    {
-      "type": "path",
-      "url": "packages/epagos-bridge",
-      "options": {
-        "symlink": true
-      }
-    }
-  ],
-  "require": {
-    "egaribotti/epagos-bridge": "^1.0"
-  }
-}
-```
-
 Ejecutar composer
 
 ```bash
-composer update
+composer require egaribotti/epagos-bridge
 ```
 
 ## 🔐 Variables de Entorno
@@ -114,6 +81,7 @@ Epagos::crearPago($payload);
 Epagos::crearOperacionesLote($payload);
 Epagos::obtenerMediosPago($credenciales);
 Epagos::verificarPagoManualmente($idTransaccion);
+Epagos::validarVencimiento($operaciones);
 ```
 
 
