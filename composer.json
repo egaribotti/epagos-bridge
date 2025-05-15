@@ -1,0 +1,21 @@
+{
+    "name": "egaribotti/epagos-bridge",
+    "version": "1.0.2",
+    "type": "library",
+    "autoload": {
+        "psr-4": {
+            "EpagosBridge\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Ezequiel Garibotti",
+            "email": "egaribotti@sugit.com.ar"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "php": "^8.1",
+        "ext-soap": "*"
+    }
+}
