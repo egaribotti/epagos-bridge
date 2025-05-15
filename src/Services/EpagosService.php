@@ -44,12 +44,17 @@ class EpagosService
         $respuesta = $epagosApi->solicitudPago($payload);
         $montoFinal = $respuesta->fp[0]->importe_fp;
 
-        $boleta = Boleta::create([
-            'boleta_estado_id' => 1, // Pendiente
-            'id_transaccion' => $respuesta->id_transaccion,
-            'id_organismo' => $respuesta->id_organismo,
-            'monto_final' => $montoFinal,
-        ]);
+        if ($boletaId = $payload->boleta_id) {
+            $boleta = Boleta::findOrFail($boletaId);
+
+        } else {
+            $boleta = Boleta::create([
+                'boleta_estado_id' => 1, // Pendiente
+                'id_transaccion' => $respuesta->id_transaccion,
+                'id_organismo' => $respuesta->id_organismo,
+                'monto_final' => $montoFinal,
+            ]);
+        }
 
         if ($operacionesLote = $payload->operaciones_lote) {
             Operacion::whereIn('id_transaccion', $operacionesLote)

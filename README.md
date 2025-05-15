@@ -1,7 +1,7 @@
 
 # Epagos Bridge
 
-![Versión](https://img.shields.io/badge/versión-1.0.4-blue.svg)
+![Versión](https://img.shields.io/badge/versión-1.0.5-blue.svg)
 
 Este paquete permite integrar Epagos de forma rápida y sencilla en cualquier proyecto.
 Incluye una implementación básica de medidas de seguridad y está diseñado para facilitar la generación de solicitudes de pago, así como la gestión de las respuestas recibidas desde la plataforma.
@@ -17,7 +17,7 @@ composer require egaribotti/epagos-bridge
 
 ## 🔐 Variables de Entorno
 
-Para que el paquete funcione correctamente, es necesario definir las siguientes variables de entorno en el archivo `.env` del proyecto.
+Para que el paquete funcione correctamente, es necesario definir las siguientes variables de entorno en el archivo `.env` del proyecto:
 
 ```env
 EPAGOS_WSDL=
@@ -51,7 +51,7 @@ $payload = [
 ];
 ```
 
-Utilizar el paquete es simple. A continuación se muestra un ejemplo básico para crear una solicitud de pago.
+Utilizar el paquete es simple. A continuación se muestra un ejemplo básico para crear una solicitud de pago:
 
 ```php
 use EpagosBridge\Epagos;
@@ -74,7 +74,7 @@ $payload = [
 $pagoAdeudado = Epagos::crearPago($payload);
 ```
 
-Estos son los métodos estaticos actualmente disponibles.
+Estos son los métodos estaticos actualmente disponibles:
 
 ```php
 Epagos::crearPago($payload);
@@ -89,7 +89,7 @@ Epagos::validarVencimiento($operaciones);
 
 A continuación se detallan los métodos disponibles en el paquete, junto con su descripción, parámetros esperados y ejemplos de uso.
 
-- Ejemplo de payload enviado al método `crearPago`
+- Ejemplo de payload enviado al método `crearPago`:
 ```php
 use EpagosBridge\Epagos;
 use Carbon\Carbon;
@@ -116,6 +116,7 @@ $payload = [
     'identificador_externo_3' => null,
     'identificador_externo_4' => null,
     'referencia_adicional' => null,
+    'boleta_id' => null,
     'id_fp' => 4,
     'fecha_vencimiento' => Carbon::now()->addDay()->toDateString(),
     'operaciones_lote' => [],
@@ -133,7 +134,7 @@ Epagos::crearPago($payload);
 |`url`|string|La URL para ir a pagar.|
 
 
-- Ejemplo de payload enviado al método `crearOperacionesLote`
+- Ejemplo de payload enviado al método `crearOperacionesLote`:
 ```php
 $lote = [[
     'convenio' => null,
