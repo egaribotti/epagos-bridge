@@ -11,14 +11,14 @@ Route::prefix('epagos-bridge')
     ->name('epagos.')
     ->group(function () {
         Route::post('/webhook', function (Request $request) {
-            if (!$request->token_secreto || !$request->id_transaccion || !$request->numero_operacion) {
+            if (!$request->token || !$request->id_transaccion || !$request->numero_operacion) {
                 return Response::json();
             }
-            $token = strtoupper('epagos_token_secreto');
+            $token = strtoupper('epagos_webhook_token');
 
             // Para evitar solicitudes de otro origen que no es Epagos
 
-            if (Env::get($token) === $request->token_secreto) {
+            if (Env::get($token) === $request->token) {
                 $operacion = Operacion::where('id_transaccion', $request->id_transaccion)
                     ->where('codigo_externo', $request->numero_operacion)
                     ->exists();
@@ -28,5 +28,5 @@ Route::prefix('epagos-bridge')
                 }
             }
             return Response::json();
-        })->middleware('throttle:50,1');
+        })->middleware('throttle:100,1');
     });

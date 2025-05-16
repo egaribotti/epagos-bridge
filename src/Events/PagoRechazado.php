@@ -10,9 +10,7 @@ class PagoRechazado
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public function __construct(
-        public object $boleta
-    )
+    public function __construct(public int $idTransaccion)
     {
     }
 }

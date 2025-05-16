@@ -4,7 +4,7 @@ use EpagosBridge\Jobs\VerificarPago;
 use EpagosBridge\Models\Boleta;
 use Illuminate\Support\Facades\Artisan;
 
-Artisan::command('epagos:verificar-boletas', function () {
+Artisan::command('epagos:verificar-pagos', function () {
     $boletas = Boleta::whereNull('fecha_verificacion')
         ->where('boleta_estado_id', 1)
         ->limit(100)
@@ -20,4 +20,5 @@ Artisan::command('epagos:verificar-boletas', function () {
     foreach ($boletas as $boleta) {
         VerificarPago::dispatchSync($boleta->id_transaccion);
     }
-})->purpose('Verificar las boletas pendientes');
+
+})->purpose('Verificar los pagos con estado pendiente');

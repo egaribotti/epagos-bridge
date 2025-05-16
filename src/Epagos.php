@@ -2,7 +2,6 @@
 
 namespace EpagosBridge;
 
-use EpagosBridge\Jobs\VerificarPago;
 use EpagosBridge\Services\EpagosService;
 use Illuminate\Container\Container;
 use Illuminate\Support\Fluent;
@@ -31,10 +30,5 @@ class Epagos
     {
         return Container::getInstance()->make(EpagosService::class)
             ->obtenerMediosPago($credenciales);
-    }
-
-    public static function verificarPagoManualmente(int $idTransaccion): void
-    {
-        VerificarPago::dispatchSync($idTransaccion);
     }
 }

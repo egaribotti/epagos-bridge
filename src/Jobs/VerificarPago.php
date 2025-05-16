@@ -19,9 +19,7 @@ class VerificarPago implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public function __construct(
-        public int $idTransaccion
-    )
+    public function __construct(public int $idTransaccion)
     {
     }
 
@@ -41,7 +39,7 @@ class VerificarPago implements ShouldQueue
             // Para acreditar el monto final de la boleta debe coincidir con el monto pagado
 
             Boleta::find($boleta->id)->update([
-                'boleta_estado_id' => 4,
+                'boleta_estado_id' => 2,
                 'url_recibo' => $pago->Recibo,
                 'fecha_pago' => Carbon::parse($pago->FechaPago),
                 'fecha_verificacion' => Carbon::now()
@@ -49,16 +47,16 @@ class VerificarPago implements ShouldQueue
 
             PagoAcreditado::dispatch($boleta);
         } else {
-            $estados = [79 => 1, 80 => 1, 86 => 5, 68 => 7];
+            $estados = [79 => 1, 80 => 1, 86 => 4, 68 => 5];
 
-            $boletaEstadoId = $estados[ord($pago->Estado)] ?? 6;
+            $boletaEstadoId = $estados[ord($pago->Estado)] ?? 3;
             Boleta::find($boleta->id)->update([
                 'boleta_estado_id' => $boletaEstadoId,
                 'fecha_verificacion' => Carbon::now()
             ]);
 
             if ($boletaEstadoId === 1) return;
-            $boletaEstadoId === 7 ? PagoDevuelto::dispatch($boleta) : PagoRechazado::dispatch($boleta);
+            $boletaEstadoId === 5 ? PagoDevuelto::dispatch($boleta) : PagoRechazado::dispatch($boleta);
         }
     }
 }

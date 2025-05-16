@@ -44,17 +44,12 @@ class EpagosService
         $respuesta = $epagosApi->solicitudPago($payload);
         $montoFinal = $respuesta->fp[0]->importe_fp;
 
-        if ($boletaId = $payload->boleta_id) {
-            $boleta = Boleta::findOrFail($boletaId);
-
-        } else {
-            $boleta = Boleta::create([
-                'boleta_estado_id' => 1, // Pendiente
-                'id_transaccion' => $respuesta->id_transaccion,
-                'id_organismo' => $respuesta->id_organismo,
-                'monto_final' => $montoFinal,
-            ]);
-        }
+        $boleta = Boleta::create([
+            'boleta_estado_id' => 1, // Pendiente
+            'id_transaccion' => $respuesta->id_transaccion,
+            'id_organismo' => $respuesta->id_organismo,
+            'monto_final' => $montoFinal,
+        ]);
 
         if ($operacionesLote = $payload->operaciones_lote) {
             Operacion::whereIn('id_transaccion', $operacionesLote)
@@ -79,6 +74,7 @@ class EpagosService
             'boleta_id' => $boleta->id,
             'id_transaccion' => $respuesta->id_transaccion,
             'referencia_adicional' => $refAdicional,
+            'monto_final' => $montoFinal,
             'url' => $respuesta->fp[0]->url_qr,
         ]);
     }
@@ -91,15 +87,15 @@ class EpagosService
 
         $lote = [];
         $montoLote = 0;
-        foreach ($payload->lote as $loteItem) {
-            $loteItem = new Fluent($loteItem);
+        foreach ($payload->lote as $itemLote) {
+            $itemLote = new Fluent($itemLote);
 
-            $this->calcularMontoFinal($loteItem);
-            $loteItem->fecha_vencimiento = $loteItem->fecha_vencimiento
+            $this->calcularMontoFinal($itemLote);
+            $itemLote->fecha_vencimiento = $itemLote->fecha_vencimiento
                 ?? Carbon::now()->addDays(7)->toDateString();
 
-            $lote[] = $loteItem;
-            $montoLote += $loteItem->monto_final;
+            $lote[] = $itemLote;
+            $montoLote += $itemLote->monto_final;
         }
         $payload->lote = $lote;
 
@@ -107,18 +103,18 @@ class EpagosService
         $respuesta = $epagosApi->solicitudPagoLote($payload);
 
         $operacionesLote = [];
-        foreach ($respuesta->lote as $loteItem) {
-            $idTransaccion = $loteItem->id_transaccion;
-            $codigoDividido = explode(chr(124), $loteItem->numero_operacion);
+        foreach ($respuesta->lote as $itemLote) {
+            $idTransaccion = $itemLote->id_transaccion;
+            $codigoDividido = explode(chr(124), $itemLote->numero_operacion);
             $refAdicional = count($codigoDividido) > 1 ? $codigoDividido[0] : null;
 
             Operacion::create([
                 'referencia_adicional' => $refAdicional,
-                'codigo_externo' => $loteItem->numero_operacion,
+                'codigo_externo' => $itemLote->numero_operacion,
                 'id_transaccion' => $idTransaccion,
                 'id_organismo' => $respuesta->id_organismo,
-                'monto' => $loteItem->respuesta_forma_pago_array[0]->importe_fp,
-                'fecha_vencimiento' => $loteItem->respuesta_forma_pago_array[0]->fechavenc_fp,
+                'monto' => $itemLote->respuesta_forma_pago_array[0]->importe_fp,
+                'fecha_vencimiento' => $itemLote->respuesta_forma_pago_array[0]->fechavenc_fp,
             ]);
 
             $refAdicional

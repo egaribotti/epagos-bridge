@@ -169,15 +169,15 @@ class EpagosApi
     {
         $credenciales = $this->obtenerToken($payload->credenciales);
         $lote = [];
-        foreach ($payload->lote as $loteItem) {
-            $operacion = $this->solicitudPago($loteItem);
+        foreach ($payload->lote as $itemLote) {
+            $operacion = $this->solicitudPago($itemLote);
             $lote[] = [
                 'fp' => [[
-                    'id_fp' => $loteItem->id_fp ?? 4, // Pago fácil
-                    'monto_fp' => $loteItem->monto_final,
+                    'id_fp' => $itemLote->id_fp ?? 4, // Pago fácil
+                    'monto_fp' => $itemLote->monto_final,
                 ]],
                 'operacion' => $operacion,
-                'convenio' => $loteItem->convenio,
+                'convenio' => $itemLote->convenio,
             ];
         }
 
