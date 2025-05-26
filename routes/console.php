@@ -11,7 +11,7 @@ Artisan::command('epagos:verificar-pagos', function () {
         ->get();
     if ($boletas->isEmpty()) {
 
-        // Cuando ya no hay nada más que verificar, vuelvo a empezar
+        // Cuando ya no hay nada más que verificar, vuelve a empezar
 
         Boleta::where('boleta_estado_id', 1)->update([
             'fecha_verificacion' => null

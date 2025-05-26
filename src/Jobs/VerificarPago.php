@@ -25,11 +25,13 @@ class VerificarPago implements ShouldQueue
 
     public function handle(): void
     {
-        $operacion = Operacion::firstWhere('id_transaccion', $this->idTransaccion);
+        $idTransaccion = $this->idTransaccion;
+
+        $operacion = Operacion::firstWhere('id_transaccion', $idTransaccion);
         $boleta = $operacion->boleta;
 
-        $api = new EpagosApi();
-        $respuesta = $api->obtenerPagos($operacion->id_organismo, $operacion->id_transaccion, $operacion->codigo_externo);
+        $epagosApi = new EpagosApi();
+        $respuesta = $epagosApi->obtenerPagos($operacion->id_organismo, $idTransaccion, $operacion->codigo_externo);
         if ($respuesta->cantidadTotal === 0) {
             return;
         }
@@ -45,7 +47,7 @@ class VerificarPago implements ShouldQueue
                 'fecha_verificacion' => Carbon::now()
             ]);
 
-            PagoAcreditado::dispatch($boleta);
+            PagoAcreditado::dispatch($idTransaccion);
         } else {
             $estados = [79 => 1, 80 => 1, 86 => 4, 68 => 5];
 
@@ -56,7 +58,7 @@ class VerificarPago implements ShouldQueue
             ]);
 
             if ($boletaEstadoId === 1) return;
-            $boletaEstadoId === 5 ? PagoDevuelto::dispatch($boleta) : PagoRechazado::dispatch($boleta);
+            $boletaEstadoId === 5 ? PagoDevuelto::dispatch($idTransaccion) : PagoRechazado::dispatch($idTransaccion);
         }
     }
 }
