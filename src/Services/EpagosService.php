@@ -140,7 +140,7 @@ class EpagosService
                 throw new EpagosException('El monto item no puede ser menor o igual a 0.');
             }
 
-            $descItem = sprintf('%s (Cantidad: %d)', $item->desc_item, $item->cantidad_item);
+            $descItem = $item->cantidad_item > 1 ? sprintf('%s (Cant.: %d)', $item->desc_item, $item->cantidad_item) : $item->desc_item;
 
             $montoFinal += $montoItem;
             $items[] = [
