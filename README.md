@@ -1,6 +1,6 @@
 # Epagos Bridge
 
-![Versión](https://img.shields.io/badge/versión-1.0.8-blue.svg)
+![Versión](https://img.shields.io/badge/versión-1.0.9-blue.svg)
 
 Este paquete permite integrar Epagos de forma rápida y sencilla en cualquier proyecto con Laravel.
 Incluye una implementación básica de medidas de seguridad y está diseñado para facilitar la generación de solicitudes de
@@ -24,6 +24,19 @@ return [
 ];
 ```
 
+Ejecute el comando para crear las tablas necesarias.
+
+```
+php artisan migrate
+```
+
+Para los estados de las boletas, **se requiere** ejecutar las siguientes consultas SQL:
+
+```sql
+insert into epagos_boleta_estados (id, descripcion)
+values (1, 'pendiente'),(2, 'acreditado'),(3, 'rechazado'),(4, 'vencido'),(5, 'devuelto');
+```
+
 ## 🔐 Variables de Entorno
 
 Para que el paquete funcione correctamente, es necesario definir las siguientes variables de entorno en el archivo
@@ -36,10 +49,9 @@ EPAGOS_WEBHOOK_TOKEN=
 
 ## 🗂️ Base de datos
 
-Es necesario crear las siguientes tablas para que el paquete funcione correctamente. A continuación se detalla el modelo
-entidad-relación (DER) que define la estructura de la base de datos:
+A continuación se detalla el modelo entidad-relación (DER) que define la estructura de la base de datos:
 
-![DER](./epagos-bridge-der.png)
+![DER](./der.jpg)
 
 ## 🛠️ Modo de uso
 
@@ -67,10 +79,9 @@ $payload = [
 Estos son los métodos estaticos actualmente disponibles:
 
 ```php
+Epagos::obtenerMediosPago($credenciales);
 Epagos::crearPago($payload);
 Epagos::crearOperacionesLote($payload);
-Epagos::obtenerMediosPago($credenciales);
-Epagos::validarVencimiento($operaciones);
 ```
 
 ## 📚 Métodos
@@ -181,6 +192,14 @@ puede despachar diferentes eventos según el resultado de la verificación.
 - ✅ `PagoAcreditado`: Se dispara cuando el pago fue acreditado.
 - ❌ `PagoRechazado`: Se dispara cuando el pago fue rechazado ó vencido.
 - 🔄 `PagoDevuelto`: Se dispara cuando el pago fue devuelto al pagador.
+
+## ⚙️ Comandos
+
+Además, se recomienda registrar el siguiente comando cada **5 minutos o más** para la verificación de los pagos en caso de que el webhook falle o no esté configurado.
+
+```
+php artisan epagos:verificar-pagos
+```
 
 ## 📄 Licencia
 

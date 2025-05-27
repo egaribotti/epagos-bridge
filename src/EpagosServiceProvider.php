@@ -15,6 +15,7 @@ class EpagosServiceProvider extends ServiceProvider
         }
 
         $this->loadRoutesFrom($basePath . 'routes/web.php');
+        $this->loadMigrationsFrom($basePath . 'database/migrations');
     }
 
     public function register(): void

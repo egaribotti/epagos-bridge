@@ -12,6 +12,7 @@ class Boleta extends Model
         'id_transaccion',
         'id_organismo',
         'boleta_estado_id',
+        'id_fp',
         'monto_final',
         'url_recibo',
         'fecha_pago',

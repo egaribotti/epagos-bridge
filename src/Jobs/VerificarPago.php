@@ -42,6 +42,7 @@ class VerificarPago implements ShouldQueue
 
             Boleta::find($boleta->id)->update([
                 'boleta_estado_id' => 2,
+                'id_fp' => $pago->FormaPago[0]->Identificador,
                 'url_recibo' => $pago->Recibo,
                 'fecha_pago' => Carbon::parse($pago->FechaPago),
                 'fecha_verificacion' => Carbon::now()
