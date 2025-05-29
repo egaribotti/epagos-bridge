@@ -69,7 +69,7 @@ class EpagosApi
         return $respuesta;
     }
 
-    public function obtenerPagos(int $organismoId, int $idTransaccion, string $codigoExterno): object
+    public function obtenerPago(int $organismoId, int $idTransaccion, string $codigoExterno): object
     {
         $credenciales = Credencial::where('id_organismo', $organismoId)->firstOrFail();
         $criterios = [

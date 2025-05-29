@@ -33,6 +33,18 @@ class EpagosService
         ]);
     }
 
+    public function obtenerPago(int $idTransaccion): ?object
+    {
+        $operacion = Operacion::firstWhere('id_transaccion', $idTransaccion);
+        if (!$operacion) {
+            return null;
+        }
+
+        $epagosApi = new EpagosApi();
+        $respuesta = $epagosApi->obtenerPago($operacion->id_organismo, $idTransaccion, $operacion->codigo_externo);
+        return $respuesta->cantidadTotal === 1 ? $respuesta->pago[0] : null;
+    }
+
     public function crearPago(object $payload): object
     {
         if ($payload->operaciones_lote && count($payload->operaciones_lote) > 100) {

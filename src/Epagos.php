@@ -26,6 +26,12 @@ class Epagos
             ->crearOperacionesLote(new Fluent($payload));
     }
 
+    public static function obtenerPago(int $idTransaccion): ?object
+    {
+        return Container::getInstance()->make(EpagosService::class)
+            ->obtenerPago($idTransaccion);
+    }
+
     public static function obtenerMediosPago(array $credenciales): array
     {
         return Container::getInstance()->make(EpagosService::class)
