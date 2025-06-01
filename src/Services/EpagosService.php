@@ -88,6 +88,7 @@ class EpagosService
             'referencia_adicional' => $refAdicional,
             'monto_final' => $montoFinal,
             'url' => $respuesta->fp[0]->url_qr,
+            'pdf' => !empty($respuesta->fp[0]->pdf) ? base64_encode($respuesta->fp[0]->pdf) : null,
         ]);
     }
 
@@ -101,6 +102,8 @@ class EpagosService
         $montoLote = 0;
         foreach ($payload->lote as $itemLote) {
             $itemLote = new Fluent($itemLote);
+
+            $itemLote->pdf = false; // Para acelerar la creación desactivo los PDF
 
             $this->calcularMontoFinal($itemLote);
             $itemLote->fecha_vencimiento = $itemLote->fecha_vencimiento

@@ -1,6 +1,6 @@
 # Epagos Bridge
 
-![Versión](https://img.shields.io/badge/versión-1.0.11-blue.svg)
+![Versión](https://img.shields.io/badge/versión-1.0.12-red.svg)
 
 Este paquete permite integrar Epagos de forma rápida y sencilla en cualquier proyecto con Laravel.
 Incluye una implementación básica de medidas de seguridad y está diseñado para facilitar la generación de solicitudes de
@@ -44,14 +44,8 @@ Para que el paquete funcione correctamente, es necesario definir las siguientes 
 
 ```env
 EPAGOS_WSDL=
-EPAGOS_WEBHOOK_TOKEN=
+EPAGOS_WEBHOOK_SECRET=
 ```
-
-## 🗂️ Base de datos
-
-A continuación se detalla el modelo entidad-relación (DER) que define la estructura de la base de datos:
-
-![DER](./der.jpg)
 
 ## 🛠️ Modo de uso
 
@@ -121,19 +115,21 @@ $payload = [
     'fecha_vencimiento' => Carbon::now()->addDay()->toDateString(),
     'operaciones_lote' => [],
     'id_fp' => 4,
+    'pdf' => false
 ];
 Epagos::crearPago($payload);
 ```
 
 **Estructura de la respuesta:**
 
-| Propiedad              | Tipo    | Descripción                       |
-|------------------------|---------|-----------------------------------|
-| `boleta_id`            | integer | Id de la boleta creada.           |
-| `id_transaccion`       | integer | Id de transacción en Epagos.      |
-| `referencia_adicional` | string  | En caso de que haya especificado. |
-| `monto_final`          | float   | El monto final a pagar.           |
-| `url`                  | string  | La URL para ir a pagar.           |
+| Propiedad              | Tipo    | Descripción                                      |
+|------------------------|---------|--------------------------------------------------|
+| `boleta_id`            | integer | Id de la boleta creada.                          |
+| `id_transaccion`       | integer | Id de transacción en Epagos.                     |
+| `referencia_adicional` | string  | En caso de que haya especificado.                |
+| `monto_final`          | float   | El monto final a pagar.                          |
+| `url`                  | string  | La URL para ir a pagar.                          |
+| `pdf`                  | base64  | El PDF del comprobante para el pago en efectivo. |
 
 - Ejemplo de payload enviado al método `crearOperacionesLote`:
 

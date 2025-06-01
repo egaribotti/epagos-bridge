@@ -110,11 +110,11 @@ class EpagosApi
             'identificador_cliente' => null,
             'id_moneda_operacion' => 1,
             'monto_operacion' => $payload->monto_final,
-            'opc_pdf' => false,
+            'opc_pdf' => true,
             'opc_fecha_vencimiento' => $payload->fecha_vencimiento,
             'opc_devolver_qr' => false,
             'opc_devolver_codbarras' => false,
-            'opc_generar_pdf' => false,
+            'opc_generar_pdf' => $payload->pdf ?? false,
             'opc_operaciones_lote' => $operacionesLote,
             'detalle_operacion' => $payload->items,
             'pagador' => [
@@ -157,6 +157,7 @@ class EpagosApi
             'url' => $respuesta->fp ? $respuesta->fp[0]->url_qr : null,
             'request_content' => $this->cliente->__getLastRequest(),
             'response_content' => $this->cliente->__getLastResponse(),
+            'pdf' => $respuesta->fp && !empty($respuesta->fp[0]->pdf) ? base64_encode($respuesta->fp[0]->pdf) : null,
         ]));
 
         if (intval($respuesta->id_resp) !== 2002) {

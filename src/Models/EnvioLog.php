@@ -18,5 +18,6 @@ class EnvioLog extends Model
         'url',
         'request_content',
         'response_content',
+        'pdf',
     ];
 }

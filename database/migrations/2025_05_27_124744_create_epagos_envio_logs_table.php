@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('url')->nullable();
             $table->longText('request_content');
             $table->longText('response_content');
+            $table->longText('pdf')->nullable();
             $table->timestamps();
         });
     }
