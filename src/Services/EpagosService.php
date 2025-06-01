@@ -47,6 +47,10 @@ class EpagosService
 
     public function crearPago(object $payload): object
     {
+        if (!$payload->credenciales) {
+            throw new EpagosException('Las credenciales son requeridas.');
+        }
+
         if ($payload->operaciones_lote && count($payload->operaciones_lote) > 100) {
             throw new EpagosException('El máximo de operaciones por lote es 100.');
         }
@@ -82,13 +86,15 @@ class EpagosService
             'fecha_vencimiento' => $respuesta->fp[0]->fechavenc_fp,
         ]);
 
+        $pdf = $respuesta->fp[0]->pdf; // Esta en binario
+
         return new Fluent([
             'boleta_id' => $boleta->id,
             'id_transaccion' => $respuesta->id_transaccion,
             'referencia_adicional' => $refAdicional,
             'monto_final' => $montoFinal,
             'url' => $respuesta->fp[0]->url_qr,
-            'pdf' => !empty($respuesta->fp[0]->pdf) ? base64_encode($respuesta->fp[0]->pdf) : null,
+            'pdf' => !empty($pdf) ? base64_encode($pdf) : null,
         ]);
     }
 

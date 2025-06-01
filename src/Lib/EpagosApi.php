@@ -152,12 +152,16 @@ class EpagosApi
         }
         $respuesta = new Fluent($respuesta);
 
-        EnvioLog::create(array_merge($respuesta->toArray(), $credenciales, [
+        $fp = $respuesta->fp ? [
+            'url' => $respuesta->fp[0]->url_qr,
+            'codigo_barras' => $respuesta->fp[0]->codigo_barras_fp,
+            'pdf' => !empty($respuesta->fp[0]->pdf) ? base64_encode($respuesta->fp[0]->pdf) : null,
+        ] : [];
+
+        EnvioLog::create(array_merge($respuesta->toArray(), $credenciales, $fp, [
             'codigo_externo' => $codigoExterno,
-            'url' => $respuesta->fp ? $respuesta->fp[0]->url_qr : null,
             'request_content' => $this->cliente->__getLastRequest(),
             'response_content' => $this->cliente->__getLastResponse(),
-            'pdf' => $respuesta->fp && !empty($respuesta->fp[0]->pdf) ? base64_encode($respuesta->fp[0]->pdf) : null,
         ]));
 
         if (intval($respuesta->id_resp) !== 2002) {
