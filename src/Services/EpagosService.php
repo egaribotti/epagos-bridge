@@ -18,19 +18,11 @@ class EpagosService
         return $respuesta->fp;
     }
 
-    public function validarVencimiento(array $operaciones): object
+    public function operacionVencida(int $idTransaccion): bool
     {
-        $operaciones = Operacion::whereIn('id_transaccion', $operaciones)->get();
+        $operacion = Operacion::where('id_transaccion', $idTransaccion)->firstOrFail();
 
-        $vencidas = [];
-        foreach ($operaciones as $operacion) {
-            if ($operacion->fecha_vencimiento < Carbon::now()) {
-                $vencidas[] = $operacion->id_transaccion;
-            }
-        }
-        return new Fluent([
-            'vencidas' => $vencidas,
-        ]);
+        return $operacion->fecha_vencimiento < Carbon::now();
     }
 
     public function obtenerPago(int $idTransaccion): ?object
@@ -85,16 +77,15 @@ class EpagosService
             'monto' => $montoFinal,
             'fecha_vencimiento' => $respuesta->fp[0]->fechavenc_fp,
         ]);
-
         $pdf = $respuesta->fp[0]->pdf; // Esta en binario
 
         return new Fluent([
             'boleta_id' => $boleta->id,
-            'id_transaccion' => $respuesta->id_transaccion,
             'referencia_adicional' => $refAdicional,
+            'id_transaccion' => $respuesta->id_transaccion,
             'monto_final' => $montoFinal,
             'url' => $respuesta->fp[0]->url_qr,
-            'pdf' => !empty($pdf) ? base64_encode($pdf) : null,
+            'pdf' => strlen($pdf) === 19 ? null : base64_encode($pdf),
         ]);
     }
 
@@ -161,7 +152,7 @@ class EpagosService
                 throw new EpagosException('El monto item no puede ser menor o igual a 0.');
             }
 
-            $descItem = $item->cantidad_item > 1 ? sprintf('%s (Cant.: %d)', $item->desc_item, $item->cantidad_item) : $item->desc_item;
+            $descItem = $item->cantidad_item > 1 ? sprintf('%s (Cant: %d)', $item->desc_item, $item->cantidad_item) : $item->desc_item;
 
             $montoFinal += $montoItem;
             $items[] = [
@@ -171,7 +162,6 @@ class EpagosService
                 'cantidad_item' => 1 // Para evitar conflictos, se deja 1 como valor fijo
             ];
         }
-
         if ($montoFinal <= 0) {
             throw new EpagosException('La suma de los monto item no puede ser menor o igual a 0.');
         }

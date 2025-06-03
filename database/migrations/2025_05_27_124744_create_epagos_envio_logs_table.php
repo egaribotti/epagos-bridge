@@ -18,7 +18,6 @@ return new class extends Migration
             $table->string('respuesta');
             $table->string('url')->nullable();
             $table->string('codigo_barras')->nullable();
-            $table->longText('pdf')->nullable();
             $table->longText('request_content');
             $table->longText('response_content');
             $table->timestamps();

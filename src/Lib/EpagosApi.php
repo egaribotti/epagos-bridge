@@ -100,6 +100,7 @@ class EpagosApi
             $operacionesLote = array_map(fn (int $idOperacion) => [
                 'id_operacion' => $idOperacion], $operacionesLote);
         }
+        $pdf = $payload->pdf ?? false;
 
         $codigoExterno = ($payload->referencia_adicional ? $payload->referencia_adicional. chr(124) : null). Str::uuid()->toString();
         $operacion = [
@@ -110,11 +111,11 @@ class EpagosApi
             'identificador_cliente' => null,
             'id_moneda_operacion' => 1,
             'monto_operacion' => $payload->monto_final,
-            'opc_pdf' => true,
+            'opc_pdf' => $pdf,
             'opc_fecha_vencimiento' => $payload->fecha_vencimiento,
             'opc_devolver_qr' => false,
             'opc_devolver_codbarras' => false,
-            'opc_generar_pdf' => $payload->pdf ?? false,
+            'opc_generar_pdf' => $pdf,
             'opc_operaciones_lote' => $operacionesLote,
             'detalle_operacion' => $payload->items,
             'pagador' => [
@@ -140,7 +141,7 @@ class EpagosApi
         }
 
         $fp = [[
-            'id_fp' => $payload->id_fp ?? 4, // Pago fácil
+            'id_fp' => $payload->id_fp ?? 34,
             'monto_fp' => $payload->monto_final,
         ]];
 
@@ -152,13 +153,10 @@ class EpagosApi
         }
         $respuesta = new Fluent($respuesta);
 
-        $fp = $respuesta->fp ? [
+        EnvioLog::create(array_merge($respuesta->toArray(), $credenciales, !is_array($respuesta->fp) ? [] : [
             'url' => $respuesta->fp[0]->url_qr,
-            'codigo_barras' => $respuesta->fp[0]->codigo_barras_fp,
-            'pdf' => !empty($respuesta->fp[0]->pdf) ? base64_encode($respuesta->fp[0]->pdf) : null,
-        ] : [];
-
-        EnvioLog::create(array_merge($respuesta->toArray(), $credenciales, $fp, [
+            'codigo_barras' => $respuesta->fp[0]->codigo_barras_fp
+        ], [
             'codigo_externo' => $codigoExterno,
             'request_content' => $this->cliente->__getLastRequest(),
             'response_content' => $this->cliente->__getLastResponse(),
@@ -178,7 +176,7 @@ class EpagosApi
             $operacion = $this->solicitudPago($itemLote);
             $lote[] = [
                 'fp' => [[
-                    'id_fp' => $itemLote->id_fp ?? 4, // Pago fácil
+                    'id_fp' => $itemLote->id_fp ?? 4,
                     'monto_fp' => $itemLote->monto_final,
                 ]],
                 'operacion' => $operacion,
