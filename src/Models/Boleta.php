@@ -16,6 +16,8 @@ class Boleta extends Model
         'monto_final',
         'url_recibo',
         'fecha_pago',
+        'fecha_acreditacion',
+        'fecha_novedad',
         'fecha_verificacion',
     ];
 

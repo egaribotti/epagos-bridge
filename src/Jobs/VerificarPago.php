@@ -45,6 +45,8 @@ class VerificarPago implements ShouldQueue
                 'id_fp' => $pago->FormaPago[0]->Identificador,
                 'url_recibo' => $pago->Recibo,
                 'fecha_pago' => Carbon::parse($pago->FechaPago),
+                'fecha_acreditacion' => Carbon::parse($pago->FechaAcreditacion),
+                'fecha_novedad' => Carbon::parse($pago->FechaNovedadAcreditacion),
                 'fecha_verificacion' => Carbon::now()
             ]);
 

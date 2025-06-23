@@ -17,6 +17,8 @@ return new class extends Migration
             $table->double('monto_final');
             $table->string('url_recibo')->nullable();
             $table->timestamp('fecha_pago')->nullable();
+            $table->timestamp('fecha_acreditacion')->nullable();
+            $table->timestamp('fecha_novedad')->nullable();
             $table->timestamp('fecha_verificacion')->nullable();
             $table->timestamps();
         });
