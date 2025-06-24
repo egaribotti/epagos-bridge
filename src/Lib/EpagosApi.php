@@ -84,10 +84,19 @@ class EpagosApi
             throw new EpagosException($exception->getMessage());
         }
         $respuesta = new Fluent($respuesta);
+        list($codigoBarras, $url) = array(null, null);
+
+        if ($respuesta->cantidadTotal === 1) {
+            $pago = $respuesta->pago[0];
+            $codigoBarras = $pago->FormaPago[0]->CodigoBarras;
+            $url = $pago->Url_QR;
+        }
 
         EnvioLog::create(array_merge($respuesta->toArray(), [
             'id_transaccion' => $idTransaccion,
             'codigo_externo' => $codigoExterno,
+            'codigo_barras' => $codigoBarras,
+            'url' => $url,
             'request_content' => $this->cliente->__getLastRequest(),
             'response_content' => $this->cliente->__getLastResponse(),
         ]));
