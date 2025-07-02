@@ -20,9 +20,9 @@ class EpagosService
 
     public function operacionPendiente(int $idTransaccion): bool
     {
-        $operacion = Operacion::where('id_transaccion', $idTransaccion)->firstOrFail();
+        $operacion = Operacion::where('id_transaccion', $idTransaccion)->first();
 
-        if ($operacion->boleta_id && $operacion->boleta->boleta_estado_id !== 1) {
+        if (!$operacion || $operacion->boleta_id && $operacion->boleta->boleta_estado_id !== 1) {
 
             // La boleta que contiene la operación no está pendiente
 

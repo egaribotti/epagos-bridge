@@ -1,6 +1,6 @@
 {
     "name": "egaribotti/epagos-bridge",
-    "version": "1.0.16",
+    "version": "1.0.17",
     "type": "library",
     "license": "MIT",
     "autoload": {
