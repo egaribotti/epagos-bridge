@@ -97,8 +97,8 @@ class EpagosService
 
     public function crearOperacionesLote(object $payload): object
     {
-        if (!$payload->lote || count($payload->lote) > 50) {
-            throw new EpagosException('El lote debe tener al menos 1 y como máximo 50.');
+        if (!$payload->lote) {
+            throw new EpagosException('El lote debe tener al menos 1 item.');
         }
 
         $lote = [];
