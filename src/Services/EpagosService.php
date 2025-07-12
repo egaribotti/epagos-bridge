@@ -48,10 +48,6 @@ class EpagosService
         if (!$payload->credenciales) {
             throw new EpagosException('Las credenciales son requeridas.');
         }
-
-        if ($payload->operaciones_lote && count($payload->operaciones_lote) > 100) {
-            throw new EpagosException('El máximo de operaciones por lote es 100.');
-        }
         $this->calcularMontoFinal($payload);
 
         $epagosApi = new EpagosApi();
