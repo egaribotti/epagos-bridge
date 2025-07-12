@@ -12,7 +12,7 @@ use Illuminate\Support\Str;
 class EpagosApi
 {
     public object $cliente;
-    private string $_version = '2.0';
+    public string $version = '2.0';
 
     public function obtenerToken(array $credenciales): array
     {
@@ -34,7 +34,7 @@ class EpagosApi
         }
 
         try {
-            $respuesta = $this->cliente->obtener_token($this->_version, $credenciales);
+            $respuesta = $this->cliente->obtener_token($this->version, $credenciales);
         } catch (\SoapFault $exception) {
             throw new EpagosException($exception->getMessage());
         }
@@ -58,7 +58,7 @@ class EpagosApi
     {
         $credenciales = $this->obtenerToken($credenciales);
         try {
-            $respuesta = $this->cliente->obtener_entidades_pago($this->_version, $credenciales);
+            $respuesta = $this->cliente->obtener_entidades_pago($this->version, $credenciales);
         } catch (\SoapFault $exception) {
             throw new EpagosException($exception->getMessage());
         }
@@ -79,7 +79,7 @@ class EpagosApi
 
         $credenciales = $this->obtenerToken($credenciales->toArray());
         try {
-            $respuesta = $this->cliente->obtener_pagos($this->_version, $credenciales, $criterios);
+            $respuesta = $this->cliente->obtener_pagos($this->version, $credenciales, $criterios);
         } catch (\SoapFault $exception) {
             throw new EpagosException($exception->getMessage());
         }
@@ -156,7 +156,7 @@ class EpagosApi
 
         $credenciales = $this->obtenerToken($payload->credenciales);
         try {
-            $respuesta = $this->cliente->solicitud_pago($this->_version, 'op_pago', $credenciales, $operacion, $fp, $payload->convenio);
+            $respuesta = $this->cliente->solicitud_pago($this->version, 'op_pago', $credenciales, $operacion, $fp, $payload->convenio);
         } catch (\SoapFault $exception) {
             throw new EpagosException($exception->getMessage());
         }
@@ -194,7 +194,7 @@ class EpagosApi
         }
 
         try {
-            $respuesta = $this->cliente->solicitud_pago_lote($this->_version, 'op_pago', $credenciales, $lote);
+            $respuesta = $this->cliente->solicitud_pago_lote($this->version, 'op_pago', $credenciales, $lote);
         } catch (\SoapFault $exception) {
             throw new EpagosException($exception->getMessage());
         }

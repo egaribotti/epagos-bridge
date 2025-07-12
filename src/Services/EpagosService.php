@@ -79,7 +79,7 @@ class EpagosService
             'monto' => $montoFinal,
             'fecha_vencimiento' => $respuesta->fp[0]->fechavenc_fp,
         ]);
-        $pdf = $respuesta->fp[0]->pdf; // Esta en binario
+        $pdf = $respuesta->fp[0]->pdf; // Está en binario
 
         return new Fluent([
             'boleta_id' => $boleta->id,
