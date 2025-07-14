@@ -69,13 +69,11 @@ class EpagosApi
         return $respuesta;
     }
 
-    public function obtenerPago(int $organismoId, int $idTransaccion, string $codigoExterno): object
+    public function obtenerPago(int $organismoId, ?int $idTransaccion, array $criterios = []): object
     {
         $credenciales = Credencial::where('id_organismo', $organismoId)->firstOrFail();
-        $criterios = [
-            'CodigoUnicoTransaccion' => $idTransaccion,
-            'ExternoId' => $codigoExterno,
-        ];
+
+        $criterios = array_merge($criterios, $idTransaccion ? ['CodigoUnicoTransaccion' => $idTransaccion] : []);
 
         $credenciales = $this->obtenerToken($credenciales->toArray());
         try {
@@ -84,19 +82,21 @@ class EpagosApi
             throw new EpagosException($exception->getMessage());
         }
         $respuesta = new Fluent($respuesta);
-        list($codigoBarras, $url) = array(null, null);
+        list($codigoExterno, $codigoBarras, $url) = array(null, null, null);
 
         if ($respuesta->cantidadTotal === 1) {
             $pago = $respuesta->pago[0];
+
+            $codigoExterno = $pago->Externa;
             $codigoBarras = $pago->FormaPago[0]->CodigoBarras;
             $url = $pago->Url_QR;
         }
 
         EnvioLog::create(array_merge($respuesta->toArray(), [
+            'url' => $url,
             'id_transaccion' => $idTransaccion,
             'codigo_externo' => $codigoExterno,
             'codigo_barras' => $codigoBarras,
-            'url' => $url,
             'request_content' => $this->cliente->__getLastRequest(),
             'response_content' => $this->cliente->__getLastResponse(),
         ]));
@@ -125,6 +125,9 @@ class EpagosApi
             'opc_devolver_qr' => false,
             'opc_devolver_codbarras' => false,
             'opc_generar_pdf' => $pdf,
+            'opc_fp_excluidas' => implode(chr(44), $payload->fp_excluidas),
+            'opc_tp_excluidos' => implode(chr(44), $payload->tp_excluidos),
+            'opc_fp_permitidas' => implode(chr(44), $payload->fp_permitidas),
             'opc_operaciones_lote' => $operacionesLote,
             'detalle_operacion' => $payload->items,
             'pagador' => [

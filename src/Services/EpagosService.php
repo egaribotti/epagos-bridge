@@ -39,7 +39,7 @@ class EpagosService
         }
 
         $epagosApi = new EpagosApi();
-        $respuesta = $epagosApi->obtenerPago($operacion->id_organismo, $idTransaccion, $operacion->codigo_externo);
+        $respuesta = $epagosApi->obtenerPago($operacion->id_organismo, $idTransaccion);
         return $respuesta->cantidadTotal === 1 ? $respuesta->pago[0] : null;
     }
 

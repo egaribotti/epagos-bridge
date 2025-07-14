@@ -31,7 +31,7 @@ class VerificarPago implements ShouldQueue
         $boleta = $operacion->boleta;
 
         $epagosApi = new EpagosApi();
-        $respuesta = $epagosApi->obtenerPago($operacion->id_organismo, $idTransaccion, $operacion->codigo_externo);
+        $respuesta = $epagosApi->obtenerPago($operacion->id_organismo, $idTransaccion);
         if ($respuesta->cantidadTotal !== 1) {
             return;
         }
