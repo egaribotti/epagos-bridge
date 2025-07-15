@@ -61,7 +61,8 @@ class VerificarPago implements ShouldQueue
             ]);
 
             if ($boletaEstadoId === 1) return;
-            $boletaEstadoId === 5 ? PagoDevuelto::dispatch($idTransaccion) : PagoRechazado::dispatch($idTransaccion);
+            $boletaEstadoId === 5 ?
+                PagoDevuelto::dispatch($idTransaccion) : PagoRechazado::dispatch($idTransaccion);
         }
     }
 }

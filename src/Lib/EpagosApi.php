@@ -125,9 +125,9 @@ class EpagosApi
             'opc_devolver_qr' => false,
             'opc_devolver_codbarras' => false,
             'opc_generar_pdf' => $pdf,
-            'opc_fp_excluidas' => implode(chr(44), $payload->fp_excluidas),
-            'opc_tp_excluidos' => implode(chr(44), $payload->tp_excluidos),
-            'opc_fp_permitidas' => implode(chr(44), $payload->fp_permitidas),
+            'opc_fp_excluidas' => $payload->fp_excluidas ? implode(chr(44), $payload->fp_excluidas) : null,
+            'opc_tp_excluidos' => $payload->tp_excluidos ? implode(chr(44), $payload->tp_excluidos) : null,
+            'opc_fp_permitidas' => $payload->fp_permitidas ? implode(chr(44), $payload->fp_permitidas) : null,
             'opc_operaciones_lote' => $operacionesLote,
             'detalle_operacion' => $payload->items,
             'pagador' => [

@@ -14,7 +14,8 @@ class EpagosServiceProvider extends ServiceProvider
             require_once $basePath . 'routes/console.php';
         }
 
-        $this->loadRoutesFrom($basePath . 'routes/web.php');
+        $this->loadRoutesFrom($basePath . 'routes/webhook.php');
+        $this->loadRoutesFrom($basePath . 'routes/api.php');
         $this->loadMigrationsFrom($basePath . 'database/migrations');
     }
 
