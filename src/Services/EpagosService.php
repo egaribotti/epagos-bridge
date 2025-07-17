@@ -62,6 +62,11 @@ class EpagosService
         ]);
 
         if ($operacionesLote = $payload->operaciones_lote) {
+
+            // Si el id de transaccion pasa de boleta a item de un lote se borra la boleta raiz
+
+            Boleta::whereIn('id_transaccion', $operacionesLote)->delete();
+
             Operacion::whereIn('id_transaccion', $operacionesLote)
                 ->update([
                     'boleta_id' => $boleta->id

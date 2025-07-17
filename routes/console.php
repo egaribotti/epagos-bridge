@@ -4,10 +4,10 @@ use EpagosBridge\Jobs\VerificarPago;
 use EpagosBridge\Models\Boleta;
 use Illuminate\Support\Facades\Artisan;
 
-Artisan::command('epagos:verificar-pagos', function () {
+Artisan::command('epagos:verificar-pagos {limite=500}', function ($limite) {
     $boletas = Boleta::whereNull('fecha_verificacion')
         ->where('boleta_estado_id', 1)
-        ->limit(100)
+        ->limit($limite)
         ->get();
     if ($boletas->isEmpty()) {
 
