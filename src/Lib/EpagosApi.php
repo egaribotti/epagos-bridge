@@ -88,7 +88,7 @@ class EpagosApi
             $pago = $respuesta->pago[0];
 
             $codigoExterno = $pago->Externa;
-            $codigoBarras = $pago->FormaPago[0]->CodigoBarras;
+            $codigoBarras = $pago->FormaPago[0]->CodigoBarras ?? null;
             $url = $pago->Url_QR;
         }
 
