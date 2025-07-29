@@ -26,4 +26,9 @@ class Boleta extends Model
         return $this->belongsTo(BoletaEstado::class);
     }
 
+    public function operaciones(): object
+    {
+        return $this->hasMany(Operacion::class);
+    }
+
 }
