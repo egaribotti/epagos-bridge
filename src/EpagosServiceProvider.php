@@ -2,6 +2,8 @@
 
 namespace EpagosBridge;
 
+use EpagosBridge\Commands\LimpiarLogs;
+use EpagosBridge\Commands\SincronizarPagos;
 use Illuminate\Support\ServiceProvider;
 
 class EpagosServiceProvider extends ServiceProvider
@@ -11,7 +13,10 @@ class EpagosServiceProvider extends ServiceProvider
         $basePath = dirname(__DIR__).DIRECTORY_SEPARATOR;
 
         if ($this->app->runningInConsole()) {
-            require_once $basePath . 'routes/console.php';
+            $this->commands([
+                SincronizarPagos::class,
+                LimpiarLogs::class,
+            ]);
         }
 
         $this->loadRoutesFrom($basePath . 'routes/webhook.php');

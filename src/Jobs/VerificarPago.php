@@ -3,6 +3,7 @@
 namespace EpagosBridge\Jobs;
 
 use Carbon\Carbon;
+use EpagosBridge\Enums\EstadoPago;
 use EpagosBridge\Events\PagoAcreditado;
 use EpagosBridge\Events\PagoDevuelto;
 use EpagosBridge\Events\PagoRechazado;
@@ -36,7 +37,8 @@ class VerificarPago implements ShouldQueue
             return;
         }
         $pago = $respuesta->pago[0];
-        if (in_array(ord($pago->Estado), [65, 76]) && $boleta->monto_final === $pago->Importe) {
+        if (in_array($pago->Estado, [EstadoPago::ACREDITADO, EstadoPago::LOTE_ACREDITADO])
+            && $boleta->monto_final === $pago->Importe) {
 
             // Para acreditar el monto final de la boleta debe coincidir con el monto pagado
 
@@ -52,9 +54,10 @@ class VerificarPago implements ShouldQueue
 
             PagoAcreditado::dispatch($idTransaccion);
         } else {
-            $estados = [79 => 1, 80 => 1, 86 => 4, 68 => 5];
+            $estados = [EstadoPago::ADEUDADO => 1, EstadoPago::PENDIENTE => 1,
+                EstadoPago::VENCIDO => 4, EstadoPago::DEVUELTO => 5];
 
-            $boletaEstadoId = $estados[ord($pago->Estado)] ?? 3;
+            $boletaEstadoId = $estados[$pago->Estado] ?? 3;
             Boleta::find($boleta->id)->update([
                 'boleta_estado_id' => $boletaEstadoId,
                 'fecha_verificacion' => Carbon::now()
