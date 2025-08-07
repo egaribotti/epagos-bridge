@@ -16,6 +16,7 @@ class SincronizarPagos extends Command
     {
         $boletas = Boleta::whereNull('fecha_verificacion')
             ->where('boleta_estado_id', 1)
+            ->latest()
             ->get();
         if ($boletas->isEmpty()) {
 
@@ -24,6 +25,7 @@ class SincronizarPagos extends Command
             Boleta::where('boleta_estado_id', 1)->update([
                 'fecha_verificacion' => null
             ]);
+            return;
         }
         $barraProgreso = $this->output->createProgressBar(count($boletas));
         $barraProgreso->setOverwrite(true);
