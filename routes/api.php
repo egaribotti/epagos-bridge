@@ -16,14 +16,18 @@ Route::middleware([SecretGuard::class])->prefix('epagos-bridge')
 
             $idOrganismo = $request->id_organismo;
             if (!$request->id_transaccion && !$idOrganismo) {
-                return Response::json('El id de organismo es requerido cuando no se especifica id de transacción.', 422);
+                $error = 'El id de organismo es requerido cuando no se especifica id de transacción.';
+
+                return Response::json(compact('error'), 422);
             }
 
             if ($idTransaccion = $request->id_transaccion) {
 
                 $operacion = Operacion::firstWhere('id_transaccion', $idTransaccion);
                 if (!$operacion) {
-                    return Response::json('Operación inválida.', 422);
+                    $error = sprintf('Operación inválida (%s).', $idTransaccion);
+
+                    return Response::json(compact('error'), 422);
                 }
                 $idOrganismo = $operacion->id_organismo;
             }
@@ -34,18 +38,22 @@ Route::middleware([SecretGuard::class])->prefix('epagos-bridge')
 
         Route::get('/boletas', function (Request $request) {
             if (!$request->ids_transaccion) {
-                return Response::json('Los ids de transacción son requeridos.', 422);
+                $error = 'Los ids de transacción son requeridos.';
+
+                return Response::json(compact('error'), 422);
             }
 
             $boletas = Boleta::whereIn('id_transaccion', $request->ids_transaccion)
                 ->with(['boletaEstado', 'operaciones'])
                 ->get();
-            return Response::json($boletas);
+            return Response::json(compact('boletas'));
         });
 
         Route::post('/verificacion-manual', function (Request $request) {
             if (!$request->ids_transaccion) {
-                return Response::json('Los ids de transacción son requeridos.', 422);
+                $error = 'Los ids de transacción son requeridos.';
+
+                return Response::json(compact('error'), 422);
             }
 
             foreach ($request->ids_transaccion as $idTransaccion) {
@@ -54,6 +62,6 @@ Route::middleware([SecretGuard::class])->prefix('epagos-bridge')
             $boletas = Boleta::whereIn('id_transaccion', $request->ids_transaccion)
                 ->with('boletaEstado')
                 ->get();
-            return Response::json($boletas);
+            return Response::json(compact('boletas'));
         });
     });

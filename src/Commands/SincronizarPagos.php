@@ -2,9 +2,11 @@
 
 namespace EpagosBridge\Commands;
 
+use Carbon\Carbon;
 use EpagosBridge\Jobs\VerificarPago;
 use EpagosBridge\Models\Boleta;
 use Illuminate\Console\Command;
+use Illuminate\Support\Env;
 
 class SincronizarPagos extends Command
 {
@@ -14,28 +16,38 @@ class SincronizarPagos extends Command
 
     public function handle(): void
     {
-        $boletas = Boleta::whereNull('fecha_verificacion')
-            ->where('boleta_estado_id', 1)
-            ->latest()
-            ->get();
-        if ($boletas->isEmpty()) {
+        // Reintento verificar las boletas de hace 5 minutos
 
-            // Cuando ya no hay nada más que verificar, vuelve a empezar
-
-            Boleta::where('boleta_estado_id', 1)->update([
+        Boleta::where('boleta_estado_id', 1)
+            ->where('fecha_verificacion', '<=', Carbon::now()->subMinutes(5))
+            ->update([
                 'fecha_verificacion' => null
             ]);
-            return;
-        }
-        $barraProgreso = $this->output->createProgressBar(count($boletas));
-        $barraProgreso->setOverwrite(true);
 
-        $barraProgreso->start();
+        $boletas = Boleta::whereNull('fecha_verificacion')
+            ->where('boleta_estado_id', 1)
+            ->where('created_at', '<=', Carbon::now()->subMinutes(3))
+            ->latest()
+            ->get();
+        if ($boletas->isEmpty()) return;
+
+        // Evito volver a verificar por la fecha de verificacion
+
+        Boleta::whereIn('id_transaccion', $boletas->pluck('id_transaccion'))
+            ->update([
+                'fecha_verificacion' => Carbon::now()
+            ]);
+
+        // Es más eficiente si se usan las queues
+
+        $queue = Env::get(strtoupper('epagos_queue'));
+
         foreach ($boletas as $boleta) {
-            VerificarPago::dispatchSync($boleta->id_transaccion);
-            $barraProgreso->advance();
-        }
+            $idTransaccion = $boleta->id_transaccion;
 
-        $barraProgreso->finish();
+            $queue ? VerificarPago::dispatch($idTransaccion)->onQueue($queue)
+                : VerificarPago::dispatchSync($idTransaccion);
+        }
+        $this->info(Carbon::now());
     }
 }

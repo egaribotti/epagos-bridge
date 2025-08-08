@@ -26,6 +26,11 @@ class Boleta extends Model
         return $this->belongsTo(BoletaEstado::class);
     }
 
+    public function operacion(): object
+    {
+        return $this->hasOne(Operacion::class, 'id_transaccion', 'id_transaccion');
+    }
+
     public function operaciones(): object
     {
         return $this->hasMany(Operacion::class);

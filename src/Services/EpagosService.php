@@ -18,19 +18,6 @@ class EpagosService
         return $respuesta->fp;
     }
 
-    public function operacionPendiente(int $idTransaccion): bool
-    {
-        $operacion = Operacion::where('id_transaccion', $idTransaccion)->first();
-
-        if (!$operacion || $operacion->boleta_id && $operacion->boleta->boleta_estado_id !== 1) {
-
-            // La boleta que contiene la operación no está pendiente
-
-            return false;
-        }
-        return $operacion->fecha_vencimiento >= Carbon::now();
-    }
-
     public function obtenerPago(int $idTransaccion): ?object
     {
         $operacion = Operacion::firstWhere('id_transaccion', $idTransaccion);
