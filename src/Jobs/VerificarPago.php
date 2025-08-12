@@ -68,6 +68,7 @@ class VerificarPago implements ShouldQueue
             $boletaEstadoId = $estados[$pago->Estado] ?? 3;
             Boleta::find($boleta->id)->update([
                 'boleta_estado_id' => $boletaEstadoId,
+                'id_fp' => $pago->Estado === EstadoPago::PENDIENTE ? $pago->FormaPago[0]->Identificador : $boleta->id_fp,
                 'fecha_verificacion' => Carbon::now()
             ]);
 
