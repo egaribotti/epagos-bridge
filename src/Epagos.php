@@ -14,10 +14,10 @@ class Epagos
             ->crearPago(new Fluent($payload));
     }
 
-    public static function operacionPendiente(int $idTransaccion): bool
+    public static function obtenerComprobantePdf(int $idTransaccion): ?string
     {
         return Container::getInstance()->make(EpagosService::class)
-            ->operacionPendiente($idTransaccion);
+            ->obtenerComprobantePdf($idTransaccion);
     }
 
     public static function crearOperacionesLote(array $payload): object

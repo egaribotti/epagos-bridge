@@ -17,6 +17,7 @@ class EnvioLog extends Model
         'respuesta',
         'url',
         'codigo_barras',
+        'pdf',
         'request_content',
         'response_content',
     ];

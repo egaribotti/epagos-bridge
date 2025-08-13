@@ -3,19 +3,19 @@
 namespace EpagosBridge\Http\Middleware;
 
 use Closure;
+use EpagosBridge\Models\Config;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
-use Illuminate\Support\Env;
 
 class SecretGuard
 {
     public function handle(Request $request, Closure $next)
     {
-        $key = strtoupper('epagos_webhook_secret');
+        $secretKey = Config::getValue('secret_key');
 
         // Para evitar solicitudes de otro origen que no es Epagos
 
-        if (Env::get($key) !== $request->secret) {
+        if ($secretKey !== $request->secret) {
             return Response::json('El secret es requerido.', 401);
         }
 

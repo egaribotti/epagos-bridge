@@ -5,14 +5,14 @@ namespace EpagosBridge\Commands;
 use Carbon\Carbon;
 use EpagosBridge\Jobs\VerificarPago;
 use EpagosBridge\Models\Boleta;
+use EpagosBridge\Models\Config;
 use Illuminate\Console\Command;
-use Illuminate\Support\Env;
 
 class SincronizarPagos extends Command
 {
     protected $signature = 'epagos:sincronizar-pagos';
 
-    protected $description = 'Sincronizar pagos.';
+    protected $description = 'Sincronizar pagos con Epagos.';
 
     public function handle(): void
     {
@@ -40,7 +40,7 @@ class SincronizarPagos extends Command
 
         // Es más eficiente si se usan las queues
 
-        $queue = Env::get(strtoupper('epagos_queue'));
+        $queue = Config::getValue('on_queue');
 
         foreach ($boletas as $boleta) {
             $idTransaccion = $boleta->id_transaccion;

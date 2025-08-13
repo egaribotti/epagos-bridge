@@ -3,9 +3,9 @@
 namespace EpagosBridge\Lib;
 
 use EpagosBridge\Exceptions\EpagosException;
+use EpagosBridge\Models\Config;
 use EpagosBridge\Models\Credencial;
 use EpagosBridge\Models\EnvioLog;
-use Illuminate\Support\Env;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Str;
 
@@ -16,6 +16,11 @@ class EpagosApi
 
     public function obtenerToken(array $credenciales): array
     {
+        $fueraServicio = Config::getValue('fuera_servicio');
+        if ($fueraServicio) {
+            throw new EpagosException('La integración con Epagos está temporalmente fuera de servicio. Por favor, inténtelo de nuevo más tarde.');
+        }
+
         $credenciales = count($credenciales) < 3
             ? Credencial::firstWhere($credenciales)->toArray()
             : $credenciales;
@@ -25,10 +30,10 @@ class EpagosApi
             'cache_wsdl' => WSDL_CACHE_NONE,
             'trace' => true,
         ];
-        $wsdl = strtoupper('epagos_wsdl');
+        $wsdl = Config::getValue('wsdl');
 
         try {
-            $this->cliente = new \SoapClient(Env::get($wsdl), $opciones);
+            $this->cliente = new \SoapClient($wsdl, $opciones);
         } catch (\SoapFault $exception) {
             throw new EpagosException($exception->getMessage());
         }
@@ -109,7 +114,7 @@ class EpagosApi
             $operacionesLote = array_map(fn (int $idOperacion) => [
                 'id_operacion' => $idOperacion], $operacionesLote);
         }
-        $pdf = $payload->pdf ?? false;
+        $opcionPdf = $payload->pdf ?? false;
 
         $codigoExterno = ($payload->referencia_adicional ? $payload->referencia_adicional. chr(124) : null). Str::uuid()->toString();
         $operacion = [
@@ -120,11 +125,11 @@ class EpagosApi
             'identificador_cliente' => null,
             'id_moneda_operacion' => 1,
             'monto_operacion' => $payload->monto_final,
-            'opc_pdf' => $pdf,
+            'opc_pdf' => $opcionPdf,
             'opc_fecha_vencimiento' => $payload->fecha_vencimiento,
             'opc_devolver_qr' => false,
             'opc_devolver_codbarras' => false,
-            'opc_generar_pdf' => $pdf,
+            'opc_generar_pdf' => $opcionPdf,
             'opc_fp_excluidas' => $payload->fp_excluidas ? implode(chr(44), $payload->fp_excluidas) : null,
             'opc_tp_excluidos' => $payload->tp_excluidos ? implode(chr(44), $payload->tp_excluidos) : null,
             'opc_fp_permitidas' => $payload->fp_permitidas ? implode(chr(44), $payload->fp_permitidas) : null,
@@ -165,13 +170,23 @@ class EpagosApi
         }
         $respuesta = new Fluent($respuesta);
 
+        $pattern = Config::getValue('pdf_pattern'); // Si es que cambian la etiqueta del xml
+
+        $lastResponse = $this->cliente->__getLastResponse();
+        $pdf = null;
+        if ($opcionPdf && preg_match($pattern, $lastResponse, $matches)) {
+            $pdf = $matches[1];
+            $lastResponse = preg_replace($pattern, null, $lastResponse);
+        }
+
         EnvioLog::create(array_merge($respuesta->toArray(), $credenciales, !is_array($respuesta->fp) ? [] : [
             'url' => $respuesta->fp[0]->url_qr,
             'codigo_barras' => $respuesta->fp[0]->codigo_barras_fp
         ], [
             'codigo_externo' => $codigoExterno,
+            'pdf' => $pdf,
             'request_content' => $this->cliente->__getLastRequest(),
-            'response_content' => $this->cliente->__getLastResponse(),
+            'response_content' => $lastResponse,
         ]));
 
         if (intval($respuesta->id_resp) !== 2002) {

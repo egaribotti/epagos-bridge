@@ -10,7 +10,7 @@ class LimpiarLogs extends Command
 {
     protected $signature = 'epagos:limpiar-logs';
 
-    protected $description = 'Limpiar logs.';
+    protected $description = 'Limpiar los logs de los envios a Epagos.';
 
     public function handle(): void
     {

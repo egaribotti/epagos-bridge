@@ -34,11 +34,10 @@ class VerificarPago implements ShouldQueue
         $boleta = Boleta::firstWhere('id_transaccion', $idTransaccion);
         if (!$boleta) {
 
-            // Si es un item de un lote busco la boleta acreditadora del lote
+            // Solo las boletas pueden verificarse, si es un item de un lote no
 
-            $boleta = $operacion->boleta;
+            return;
         }
-
         $epagosApi = new EpagosApi();
         $respuesta = $epagosApi->obtenerPago($operacion->id_organismo, $idTransaccion);
         if ($respuesta->cantidadTotal !== 1) {

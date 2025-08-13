@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use EpagosBridge\Exceptions\EpagosException;
 use EpagosBridge\Lib\EpagosApi;
 use EpagosBridge\Models\Boleta;
+use EpagosBridge\Models\EnvioLog;
 use EpagosBridge\Models\Operacion;
 use Illuminate\Support\Fluent;
 
@@ -71,7 +72,6 @@ class EpagosService
             'monto' => $montoFinal,
             'fecha_vencimiento' => $respuesta->fp[0]->fechavenc_fp,
         ]);
-        $pdf = $respuesta->fp[0]->pdf; // Está en binario
 
         return new Fluent([
             'boleta_id' => $boleta->id,
@@ -79,8 +79,13 @@ class EpagosService
             'id_transaccion' => $respuesta->id_transaccion,
             'monto_final' => $montoFinal,
             'url' => $respuesta->fp[0]->url_qr,
-            'pdf' => strlen($pdf) === 19 ? null : base64_encode($pdf),
         ]);
+    }
+
+    public function obtenerComprobantePdf(int $idTransaccion): ?string
+    {
+        return EnvioLog::where('id_transaccion', $idTransaccion)->whereNotNull('pdf')
+            ->value('pdf');
     }
 
     public function crearOperacionesLote(object $payload): object
