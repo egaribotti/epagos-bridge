@@ -170,10 +170,12 @@ class EpagosApi
         }
         $respuesta = new Fluent($respuesta);
 
-        $pattern = Config::getValue('pdf_pattern'); // Si es que cambian la etiqueta del xml
+        $pdf = Config::getValue('pdf');
 
+        $pattern = json_decode($pdf)->pattern;
         $lastResponse = $this->cliente->__getLastResponse();
         $pdf = null;
+
         if ($opcionPdf && preg_match($pattern, $lastResponse, $matches)) {
             $pdf = $matches[1];
             $lastResponse = preg_replace($pattern, null, $lastResponse);

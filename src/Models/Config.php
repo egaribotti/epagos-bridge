@@ -10,8 +10,8 @@ class Config extends Model
 
     public $timestamps = false;
 
-    public static function getValue(string $key): ?string
+    public static function getValue(string $clave): ?string
     {
-        return static::where('key', $key)->value('value');
+        return static::where('clave', $clave)->value('valor');
     }
 }

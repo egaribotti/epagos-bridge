@@ -1,6 +1,6 @@
 # Epagos Bridge
 
-![Versión](https://img.shields.io/badge/versión-1.0.32-green.svg)
+![Versión](https://img.shields.io/badge/versión-1.0.33-green.svg)
 
 Este paquete permite integrar Epagos de forma rápida y sencilla en cualquier proyecto con Laravel.
 Incluye una implementación básica de medidas de seguridad y está diseñado para facilitar la generación de solicitudes de
@@ -42,16 +42,18 @@ values (1, 'pendiente'),(2, 'acreditado'),(3, 'rechazado'),(4, 'vencido'),(5, 'd
 Para que el paquete funcione correctamente se tiene que configurar los siguientes valores en la tabla `epagos_config`:
 
 ```sql
-insert into epagos_config (key, value)
+insert into epagos_config (clave, valor)
 values ('wsdl', null),('fuera_servicio', 0),('secret_key', null),
-       ('on_queue', null),('pdf_pattern', '/<pdf[^>]*>(.*?)<\/pdf>/s');
+       ('on_queue', null),('minutos_espera', 5),('limite', 100),('pdf', '{"pattern": "/<pdf[^>]*>(.*?)<\\/pdf>/is"}');
 ```
 
 - `wsdl`: Es la URL que conecta con la API de Epagos. Está especificada en la documentación. [Ver documentación](https://www.epagos.com/templates/desarrolladores/referencia.php?v=2.5)
 - `fuera_servicio`: Se utiliza en caso de que necesites frenar la integración con Epagos.
 - `secret_key`: **IMPORTANTE**. Tanto para utilizar la API de Epagos Bridge como para aceptar los pagos que se informan por webhook, es necesario configurar un secret. **No compartas esta key**.
 - `on_queue`: Para manejar la verificación de los pagos en cola se pueden configurar las queues de Laravel. Si se deja en null, los pagos se verificarán de forma síncrona (en el momento).
-- `pdf_pattern`: Si al momento de crear el pago configuras la generación de los comprobantes en PDF, se debe omitir en el guardado para evitar duplicidad. **Esta key no se cambia** a menos que Epagos modifique su XML de respuesta.
+- `minutos_espera`: Minutos de espera para volver a intentar sincronizar el estado de las boletas pendientes.
+- `limite`: Límite de boletas que se sincronizan.
+- `pdf`: Si al momento de crear el pago configuras la generación de los comprobantes en PDF, se debe omitir en el guardado para evitar duplicidad. **Este JSON no se cambia** a menos que Epagos modifique su XML de respuesta.
 
 ## 🛠️ Modo de uso
 

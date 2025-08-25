@@ -16,18 +16,23 @@ class SincronizarPagos extends Command
 
     public function handle(): void
     {
-        // Reintento verificar las boletas de hace 5 minutos
+        $minutosEspera = Config::getValue('minutos_espera') ?? 5;
+
+        // Reintento verificar las boletas cada 5 minutos o lo que esté configurado
 
         Boleta::where('boleta_estado_id', 1)
-            ->where('fecha_verificacion', '<=', Carbon::now()->subMinutes(5))
+            ->where('fecha_verificacion', '<=', Carbon::now()->subMinutes($minutosEspera))
             ->update([
                 'fecha_verificacion' => null
             ]);
 
+        $limite = Config::getValue('limite') ?? 100;
+
         $boletas = Boleta::whereNull('fecha_verificacion')
             ->where('boleta_estado_id', 1)
-            ->where('created_at', '<=', Carbon::now()->subMinutes(3))
+            ->where('created_at', '<=', Carbon::now()->subMinutes($minutosEspera))
             ->latest()
+            ->limit($limite)
             ->get();
         if ($boletas->isEmpty()) return;
 

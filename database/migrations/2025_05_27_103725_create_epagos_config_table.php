@@ -10,8 +10,8 @@ return new class extends Migration
     {
         Schema::create('epagos_config', function (Blueprint $table) {
             $table->id();
-            $table->string('key')->unique();
-            $table->longText('value')->nullable();
+            $table->string('clave')->unique();
+            $table->text('valor')->nullable();
         });
     }
 
