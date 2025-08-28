@@ -33,7 +33,7 @@ class Boleta extends Model
 
     public function formaPago(): object
     {
-        return $this->belongsTo(FormaPago::class);
+        return $this->belongsTo(FormaPago::class, 'id_fp');
     }
 
     public function pagosAdicionales(): object
