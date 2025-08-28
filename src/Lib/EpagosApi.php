@@ -17,7 +17,7 @@ class EpagosApi
     public function obtenerToken(array $credenciales): array
     {
         $fueraServicio = Config::getValue('fuera_servicio');
-        if ($fueraServicio) {
+        if (intval($fueraServicio)) {
             throw new EpagosException('La integración con Epagos está temporalmente fuera de servicio. Por favor, inténtelo de nuevo más tarde.');
         }
 

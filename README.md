@@ -1,6 +1,6 @@
 # Epagos Bridge
 
-![Versión](https://img.shields.io/badge/versión-1.0.33-green.svg)
+![Versión](https://img.shields.io/badge/versión-1.0.34-green.svg)
 
 Este paquete permite integrar Epagos de forma rápida y sencilla en cualquier proyecto con Laravel.
 Incluye una implementación básica de medidas de seguridad y está diseñado para facilitar la generación de solicitudes de
@@ -28,24 +28,12 @@ Ejecute el comando para crear las tablas necesarias.
 
 ```
 php artisan migrate
-```
-
-Para los estados de las boletas, **se requiere** ejecutar las siguientes consultas SQL:
-
-```sql
-insert into epagos_boleta_estados (id, descripcion)
-values (1, 'pendiente'),(2, 'acreditado'),(3, 'rechazado'),(4, 'vencido'),(5, 'devuelto');
+php artisan epagos:instalar
 ```
 
 ## 🔐 Configuración
 
 Para que el paquete funcione correctamente se tiene que configurar los siguientes valores en la tabla `epagos_config`:
-
-```sql
-insert into epagos_config (clave, valor)
-values ('wsdl', null),('fuera_servicio', 0),('secret_key', null),
-       ('on_queue', null),('minutos_espera', 5),('limite', 100),('pdf', '{"pattern": "/<pdf[^>]*>(.*?)<\\/pdf>/is"}');
-```
 
 - `wsdl`: Es la URL que conecta con la API de Epagos. Está especificada en la documentación. [Ver documentación](https://www.epagos.com/templates/desarrolladores/referencia.php?v=2.5)
 - `fuera_servicio`: Se utiliza en caso de que necesites frenar la integración con Epagos.
@@ -54,6 +42,8 @@ values ('wsdl', null),('fuera_servicio', 0),('secret_key', null),
 - `minutos_espera`: Minutos de espera para volver a intentar sincronizar el estado de las boletas pendientes.
 - `limite`: Límite de boletas que se sincronizan.
 - `pdf`: Si al momento de crear el pago configuras la generación de los comprobantes en PDF, se debe omitir en el guardado para evitar duplicidad. **Este JSON no se cambia** a menos que Epagos modifique su XML de respuesta.
+
+**Pattern (Regex) última version de Epagos**: `/<pdf[^>]*>(.*?)<\\/pdf>/is`
 
 ## 🛠️ Modo de uso
 
@@ -82,6 +72,7 @@ Estos son los métodos estaticos actualmente disponibles:
 
 ```php
 Epagos::obtenerMediosPago($credenciales);
+Epagos::obtenerFormasPago();
 Epagos::obtenerPago($idTransaccion);
 Epagos::crearPago($payload);
 Epagos::crearOperacionesLote($payload);
@@ -200,7 +191,7 @@ puede despachar diferentes eventos según el resultado de la verificación.
 
 ## ⚙️ Comandos
 
-Además, se recomienda registrar el siguiente comando cada **5 minutos o más** para la verificación de los pagos en caso de que el webhook falle o no esté configurado.
+Además, se recomienda registrar el siguiente comando cada **3 minutos o más** para la verificación de los pagos en caso de que el webhook falle o no esté configurado.
 
 ```
 php artisan epagos:sincronizar-pagos

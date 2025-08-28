@@ -31,6 +31,16 @@ class Boleta extends Model
         return $this->hasOne(Operacion::class, 'id_transaccion', 'id_transaccion');
     }
 
+    public function formaPago(): object
+    {
+        return $this->belongsTo(FormaPago::class);
+    }
+
+    public function pagosAdicionales(): object
+    {
+        return $this->hasMany(PagoAdicional::class, 'id_transaccion', 'id_transaccion');
+    }
+
     public function operaciones(): object
     {
         return $this->hasMany(Operacion::class);

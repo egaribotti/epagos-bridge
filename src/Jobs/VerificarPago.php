@@ -10,6 +10,7 @@ use EpagosBridge\Events\PagoRechazado;
 use EpagosBridge\Lib\EpagosApi;
 use EpagosBridge\Models\Boleta;
 use EpagosBridge\Models\Operacion;
+use EpagosBridge\Models\PagoAdicional;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -59,7 +60,29 @@ class VerificarPago implements ShouldQueue
                 'fecha_verificacion' => Carbon::now()
             ]);
 
+            if (count($pago->PagosAdicionales) > 0) {
+
+                // Evitar duplicar los pagos adicionales
+
+                $adicionales = PagoAdicional::where('id_transaccion', $idTransaccion)->count();
+
+                if ($adicionales === 0) {
+                    foreach ($pago->PagosAdicionales as $pagoAdicional) {
+
+                        PagoAdicional::create([
+                            'id_transaccion' => $pagoAdicional->CodigoUnicoTransaccion,
+                            'id_pago' => $pagoAdicional->IdPago,
+                            'id_organismo' => $respuesta->id_organismo,
+                            'forma_pago' => $pagoAdicional->FormaPago,
+                            'monto' => $pagoAdicional->Monto,
+                            'fecha_pago' => $pagoAdicional->FechaPago,
+                            'fecha_novedad' => $pagoAdicional->FechaNovedad,
+                        ]);
+                    }
+                }
+            }
             PagoAcreditado::dispatch($idTransaccion);
+
         } else {
             $estados = [EstadoPago::ADEUDADO => 1, EstadoPago::PENDIENTE => 1,
                 EstadoPago::VENCIDO => 4, EstadoPago::DEVUELTO => 5];

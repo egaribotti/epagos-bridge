@@ -7,6 +7,7 @@ use EpagosBridge\Exceptions\EpagosException;
 use EpagosBridge\Lib\EpagosApi;
 use EpagosBridge\Models\Boleta;
 use EpagosBridge\Models\EnvioLog;
+use EpagosBridge\Models\FormaPago;
 use EpagosBridge\Models\Operacion;
 use Illuminate\Support\Fluent;
 
@@ -80,6 +81,11 @@ class EpagosService
             'monto_final' => $montoFinal,
             'url' => $respuesta->fp[0]->url_qr,
         ]);
+    }
+
+    public function obtenerFormasPago(): object
+    {
+        return FormaPago::all();
     }
 
     public function obtenerComprobantePdf(int $idTransaccion): ?string

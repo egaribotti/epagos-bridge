@@ -14,6 +14,12 @@ class Epagos
             ->crearPago(new Fluent($payload));
     }
 
+    public static function obtenerFormasPago(): object
+    {
+        return Container::getInstance()->make(EpagosService::class)
+            ->obtenerFormasPago();
+    }
+
     public static function obtenerComprobantePdf(int $idTransaccion): ?string
     {
         return Container::getInstance()->make(EpagosService::class)
