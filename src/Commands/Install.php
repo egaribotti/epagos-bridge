@@ -8,9 +8,9 @@ use EpagosBridge\Models\FormaPago;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 
-class Instalar extends Command
+class Install extends Command
 {
-    protected $signature = 'epagos:instalar';
+    protected $signature = 'epagos:install';
 
     protected $description = 'Instalar.';
 
