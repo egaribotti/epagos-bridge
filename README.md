@@ -28,7 +28,7 @@ Ejecute el comando para crear las tablas necesarias.
 
 ```
 php artisan migrate
-php artisan epagos:instalar
+php artisan epagos:install
 ```
 
 ## 🔐 Configuración
