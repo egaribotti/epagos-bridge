@@ -11,7 +11,7 @@ class SecretGuard
 {
     public function handle(Request $request, Closure $next)
     {
-        $secretKey = Config::getValue('secret_key');
+        $secretKey = Config::getValor('secret_key');
 
         // Para evitar solicitudes de otro origen que no es Epagos
 

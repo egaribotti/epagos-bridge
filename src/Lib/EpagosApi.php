@@ -16,7 +16,7 @@ class EpagosApi
 
     public function obtenerToken(array $credenciales): array
     {
-        $fueraServicio = Config::getValue('fuera_servicio');
+        $fueraServicio = Config::getValor('fuera_servicio');
         if (intval($fueraServicio)) {
             throw new EpagosException('La integración con Epagos está temporalmente fuera de servicio. Por favor, inténtelo de nuevo más tarde.');
         }
@@ -30,7 +30,7 @@ class EpagosApi
             'cache_wsdl' => WSDL_CACHE_NONE,
             'trace' => true,
         ];
-        $wsdl = Config::getValue('wsdl');
+        $wsdl = Config::getValor('wsdl');
 
         try {
             $this->cliente = new \SoapClient($wsdl, $opciones);
@@ -170,7 +170,7 @@ class EpagosApi
         }
         $respuesta = new Fluent($respuesta);
 
-        $pdf = Config::getValue('pdf');
+        $pdf = Config::getValor('pdf');
 
         $pattern = json_decode($pdf)->pattern;
         $lastResponse = $this->cliente->__getLastResponse();

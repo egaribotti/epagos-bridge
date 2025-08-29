@@ -10,6 +10,7 @@ return new class extends Migration
     {
         Schema::create('epagos_formas_pago', function (Blueprint $table) {
             $table->id();
+            $table->integer('id_fp');
             $table->string('descripcion');
             $table->string('modalidad');
         });

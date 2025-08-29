@@ -1,6 +1,6 @@
 # Epagos Bridge
 
-![Versión](https://img.shields.io/badge/versión-1.1.0-green.svg)
+![Versión](https://img.shields.io/badge/versión-1.1.1-green.svg)
 
 Este paquete permite integrar Epagos de forma rápida y sencilla en cualquier proyecto con Laravel.
 Incluye una implementación básica de medidas de seguridad y está diseñado para facilitar la generación de solicitudes de
@@ -74,7 +74,7 @@ Estos son los métodos estaticos actualmente disponibles:
 Epagos::obtenerMediosPago($credenciales);
 Epagos::obtenerFormasPago();
 Epagos::obtenerPago($idTransaccion);
-Epagos::crearPago($payload);
+Epagos::crearPago($payload, $concepto);
 Epagos::crearOperacionesLote($payload);
 Epagos::obtenerComprobantePdf($idTransaccion); // Devuelve un base64 o null
 ```
@@ -117,7 +117,10 @@ $payload = [
     'id_fp' => 4,
     'pdf' => false // Se tiene que configurar el pattern
 ];
-Epagos::crearPago($payload);
+
+$concepto = 'ejemplo_pago'; // Es nullable
+
+Epagos::crearPago($payload, $concepto);
 ```
 
 **Estructura de la respuesta:**
@@ -188,6 +191,11 @@ puede despachar diferentes eventos según el resultado de la verificación.
 - ✅ `PagoAcreditado`: Se dispara cuando el pago fue acreditado.
 - ❌ `PagoRechazado`: Se dispara cuando el pago fue rechazado ó vencido.
 - 🔄 `PagoDevuelto`: Se dispara cuando el pago fue devuelto al pagador.
+
+Al crear el listener del evento tenes disponible:
+- `$this->idTransaccion` // integer
+- `$this->concepto` // null|string
+- `$this->boleta` // EpagosBridge\Models\Boleta
 
 ## ⚙️ Comandos
 

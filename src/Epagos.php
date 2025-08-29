@@ -8,10 +8,10 @@ use Illuminate\Support\Fluent;
 
 class Epagos
 {
-    public static function crearPago(array $payload): object
+    public static function crearPago(array $payload, string $concepto = null): object
     {
         return Container::getInstance()->make(EpagosService::class)
-            ->crearPago(new Fluent($payload));
+            ->crearPago(new Fluent($payload), $concepto);
     }
 
     public static function obtenerFormasPago(): object

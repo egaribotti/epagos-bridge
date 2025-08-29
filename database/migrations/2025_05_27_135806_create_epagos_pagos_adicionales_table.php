@@ -10,6 +10,7 @@ return new class extends Migration
     {
         Schema::create('epagos_pagos_adicionales', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('boleta_id')->constrained('epagos_boletas');
             $table->bigInteger('id_transaccion');
             $table->bigInteger('id_pago');
             $table->integer('id_organismo');

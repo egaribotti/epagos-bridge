@@ -10,7 +10,12 @@ class Config extends Model
 
     public $timestamps = false;
 
-    public static function getValue(string $clave): ?string
+    protected $fillable = [
+        'clave',
+        'valor',
+    ];
+
+    public static function getValor(string $clave): ?string
     {
         return static::where('clave', $clave)->value('valor');
     }

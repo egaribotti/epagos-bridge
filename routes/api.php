@@ -36,6 +36,20 @@ Route::middleware([SecretGuard::class])->prefix('epagos-bridge')
             return Response::json($respuesta);
         });
 
+        Route::get('/boletas', function (Request $request) {
+            if (!$request->ids_transaccion) {
+                $error = 'Los ids de transacción son requeridos.';
+
+                return Response::json(compact('error'), 422);
+            }
+
+            $boletas = Boleta::whereIn('id_transaccion', $request->ids_transaccion)
+                ->with('operaciones')
+                ->get();
+
+            return Response::json(compact('boletas'));
+        });
+
         Route::get('/operaciones', function (Request $request) {
             if (!$request->ids_transaccion) {
                 $error = 'Los ids de transacción son requeridos.';
@@ -44,8 +58,9 @@ Route::middleware([SecretGuard::class])->prefix('epagos-bridge')
             }
 
             $operaciones = Operacion::whereIn('id_transaccion', $request->ids_transaccion)
-                ->with(['boleta.boletaEstado'])
+                ->with('boleta')
                 ->get();
+
             return Response::json(compact('operaciones'));
         });
 
@@ -60,8 +75,9 @@ Route::middleware([SecretGuard::class])->prefix('epagos-bridge')
                 VerificarPago::dispatchSync($idTransaccion);
             }
             $boletas = Boleta::whereIn('id_transaccion', $request->ids_transaccion)
-                ->with('boletaEstado')
+                ->with('boleta')
                 ->get();
+
             return Response::json(compact('boletas'));
         });
     });

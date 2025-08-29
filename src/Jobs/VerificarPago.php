@@ -51,9 +51,9 @@ class VerificarPago implements ShouldQueue
             // Para acreditar el monto final de la boleta debe coincidir con el monto pagado
 
             Boleta::find($boleta->id)->update([
-                'boleta_estado_id' => 2,
                 'id_fp' => $pago->FormaPago[0]->Identificador,
                 'url_recibo' => $pago->Recibo,
+                'estado' => EstadoPago::ACREDITADO,
                 'fecha_pago' => Carbon::parse($pago->FechaPago),
                 'fecha_acreditacion' => Carbon::parse($pago->FechaAcreditacion),
                 'fecha_novedad' => Carbon::parse($pago->FechaNovedadAcreditacion),
@@ -64,12 +64,14 @@ class VerificarPago implements ShouldQueue
 
                 // Evitar duplicar los pagos adicionales
 
-                $adicionales = PagoAdicional::where('id_transaccion', $idTransaccion)->count();
+                $adicionales = PagoAdicional::where('boleta_id', $boleta->id)
+                    ->exists();
 
-                if ($adicionales === 0) {
+                if (! $adicionales) {
                     foreach ($pago->PagosAdicionales as $pagoAdicional) {
 
                         PagoAdicional::create([
+                            'boleta_id' => $boleta->id,
                             'id_transaccion' => $pagoAdicional->CodigoUnicoTransaccion,
                             'id_pago' => $pagoAdicional->IdPago,
                             'id_organismo' => $respuesta->id_organismo,
@@ -81,22 +83,22 @@ class VerificarPago implements ShouldQueue
                     }
                 }
             }
-            PagoAcreditado::dispatch($idTransaccion);
+            PagoAcreditado::dispatch($boleta);
 
         } else {
-            $estados = [EstadoPago::ADEUDADO => 1, EstadoPago::PENDIENTE => 1,
-                EstadoPago::VENCIDO => 4, EstadoPago::DEVUELTO => 5];
+            $estado = $pago->Estado == EstadoPago::ADEUDADO
+                ? EstadoPago::PENDIENTE : $pago->Estado;
 
-            $boletaEstadoId = $estados[$pago->Estado] ?? 3;
             Boleta::find($boleta->id)->update([
-                'boleta_estado_id' => $boletaEstadoId,
-                'id_fp' => $boletaEstadoId === 1 ? $pago->FormaPago[0]->Identificador : $boleta->id_fp,
+                'estado' => $estado,
+                'id_fp' => $estado == EstadoPago::PENDIENTE ? $pago->FormaPago[0]->Identificador : $boleta->id_fp,
                 'fecha_verificacion' => Carbon::now()
             ]);
 
-            if ($boletaEstadoId === 1) return;
-            $boletaEstadoId === 5 ?
-                PagoDevuelto::dispatch($idTransaccion) : PagoRechazado::dispatch($idTransaccion);
+            if ($estado == EstadoPago::PENDIENTE) return; // No hay evento
+
+            $estado === EstadoPago::DEVUELTO
+                ? PagoDevuelto::dispatch($boleta) : PagoRechazado::dispatch($boleta);
         }
     }
 }

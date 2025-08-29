@@ -2,7 +2,7 @@
 
 namespace EpagosBridge;
 
-use EpagosBridge\Commands\Install;
+use EpagosBridge\Commands\Instalar;
 use EpagosBridge\Commands\LimpiarLogs;
 use EpagosBridge\Commands\SincronizarPagos;
 use Illuminate\Support\ServiceProvider;
@@ -15,7 +15,7 @@ class EpagosServiceProvider extends ServiceProvider
 
         if ($this->app->runningInConsole()) {
             $this->commands([
-                Install::class,
+                Instalar::class,
                 SincronizarPagos::class,
                 LimpiarLogs::class,
             ]);

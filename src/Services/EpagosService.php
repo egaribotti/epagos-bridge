@@ -3,6 +3,7 @@
 namespace EpagosBridge\Services;
 
 use Carbon\Carbon;
+use EpagosBridge\Enums\EstadoPago;
 use EpagosBridge\Exceptions\EpagosException;
 use EpagosBridge\Lib\EpagosApi;
 use EpagosBridge\Models\Boleta;
@@ -32,7 +33,7 @@ class EpagosService
         return $respuesta->cantidadTotal === 1 ? $respuesta->pago[0] : null;
     }
 
-    public function crearPago(object $payload): object
+    public function crearPago(object $payload, ?string $concepto = null): object
     {
         if (!$payload->credenciales) {
             throw new EpagosException('Las credenciales son requeridas.');
@@ -44,9 +45,10 @@ class EpagosService
         $montoFinal = $respuesta->fp[0]->importe_fp;
 
         $boleta = Boleta::create([
-            'boleta_estado_id' => 1, // Pendiente
+            'estado' => EstadoPago::PENDIENTE,
             'id_transaccion' => $respuesta->id_transaccion,
             'id_organismo' => $respuesta->id_organismo,
+            'concepto' => $concepto,
             'monto_final' => $montoFinal,
         ]);
 

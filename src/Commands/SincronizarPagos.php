@@ -3,6 +3,7 @@
 namespace EpagosBridge\Commands;
 
 use Carbon\Carbon;
+use EpagosBridge\Enums\EstadoPago;
 use EpagosBridge\Jobs\VerificarPago;
 use EpagosBridge\Models\Boleta;
 use EpagosBridge\Models\Config;
@@ -16,20 +17,20 @@ class SincronizarPagos extends Command
 
     public function handle(): void
     {
-        $minutosEspera = Config::getValue('minutos_espera') ?? 5;
+        $minutosEspera = Config::getValor('minutos_espera') ?? 5;
 
         // Reintento verificar las boletas cada 5 minutos o lo que esté configurado
 
-        Boleta::where('boleta_estado_id', 1)
+        Boleta::where('estado', EstadoPago::PENDIENTE)
             ->where('fecha_verificacion', '<=', Carbon::now()->subMinutes($minutosEspera))
             ->update([
                 'fecha_verificacion' => null
             ]);
 
-        $limite = Config::getValue('limite') ?? 100;
+        $limite = Config::getValor('limite') ?? 100;
 
         $boletas = Boleta::whereNull('fecha_verificacion')
-            ->where('boleta_estado_id', 1)
+            ->where('estado', EstadoPago::PENDIENTE)
             ->where('created_at', '<=', Carbon::now()->subMinutes($minutosEspera))
             ->latest()
             ->limit($limite)
@@ -45,14 +46,22 @@ class SincronizarPagos extends Command
 
         // Es más eficiente si se usan las queues
 
-        $queue = Config::getValue('on_queue');
+        $queue = Config::getValor('on_queue');
 
+        $pb = $this->output->createProgressBar($boletas->count());
+        $pb->setOverwrite(true);
+
+        $pb->start();
         foreach ($boletas as $boleta) {
             $idTransaccion = $boleta->id_transaccion;
 
             $queue ? VerificarPago::dispatch($idTransaccion)->onQueue($queue)
                 : VerificarPago::dispatchSync($idTransaccion);
+
+            $pb->advance();
         }
+
+        $pb->finish();
         $this->info(Carbon::now());
     }
 }
