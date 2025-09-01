@@ -8,10 +8,24 @@ pago, así como la gestión de las respuestas recibidas desde la plataforma.
 
 ## 📦 Instalación
 
-Ejecutar composer.
+Clonar en tu proyecto.
 
 ```bash
-composer require egaribotti/epagos-bridge
+mkdir lib
+cd lib
+git clone https://github.com/egaribotti/epagos-bridge.git
+```
+
+Registrar PSR-4 en el composer.json
+
+```
+{
+    "autoload": {
+        "psr-4": {
+            "EpagosBridge\\": "lib/epagos-bridge/src"
+        }
+    }
+}
 ```
 
 Agregar el service provider en el archivo `config/app.php`.
