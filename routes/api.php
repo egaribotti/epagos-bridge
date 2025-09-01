@@ -75,7 +75,6 @@ Route::middleware([SecretGuard::class])->prefix('epagos-bridge')
                 VerificarPago::dispatchSync($idTransaccion);
             }
             $boletas = Boleta::whereIn('id_transaccion', $request->ids_transaccion)
-                ->with('boleta')
                 ->get();
 
             return Response::json(compact('boletas'));

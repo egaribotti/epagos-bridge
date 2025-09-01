@@ -2,7 +2,6 @@
 
 namespace EpagosBridge\Models;
 
-use EpagosBridge\Enums\EstadoPago;
 use Illuminate\Database\Eloquent\Model;
 
 class Boleta extends Model
@@ -22,19 +21,6 @@ class Boleta extends Model
         'fecha_novedad',
         'fecha_verificacion',
     ];
-
-    protected $appends = ['estado_descripcion'];
-
-    public function getEstadoDescripcionAttribute(): string
-    {
-        return strtolower(array_flip((new \ReflectionClass(EstadoPago::class))
-            ->getConstants())[$this->estado]);
-    }
-
-    public function operacion(): object
-    {
-        return $this->hasOne(Operacion::class, 'id_transaccion', 'id_transaccion');
-    }
 
     public function pagosAdicionales(): object
     {
